@@ -1,0 +1,48 @@
+ALTER PROCEDURE [dbo].[GenerarTurnosDiarios]
+    @fechaInicio DATETIME,
+    @fechaFin DATETIME,
+    @idServicio INT
+AS
+BEGIN
+    DECLARE @horaApertura TIME(0);
+    DECLARE @horaCierre TIME(0);
+    DECLARE @duracion INT;
+    DECLARE @fechaActual DATE;
+
+    SELECT @horaApertura = hora_apertura, @horaCierre = hora_cierre, @duracion = duracion
+    FROM dbo.servicios
+    WHERE id_servicio = @idServicio;
+
+    SET @fechaActual = CAST(@fechaInicio AS DATE);
+
+    WHILE @fechaActual <= CAST(@fechaFin AS DATE)
+
+    BEGIN
+        DECLARE @horaTurno TIME(0);
+        SET @horaTurno = @horaApertura;
+
+        WHILE @horaTurno <= DATEADD(MINUTE, -@duracion, @horaCierre)
+
+		BEGIN
+            IF NOT EXISTS (
+                SELECT 1
+                FROM turnos
+                WHERE id_servicio = @idServicio
+                    AND fecha_turno = @fechaActual
+                    AND hora_inicio = @horaTurno
+                    AND hora_fin = DATEADD(MINUTE, @duracion, @horaTurno)
+            )
+
+        BEGIN
+
+            INSERT INTO turnos (id_servicio, fecha_turno, hora_inicio, hora_fin, estado)
+            VALUES (@idServicio, @fechaActual, @horaTurno, DATEADD(MINUTE, @duracion, @horaTurno), 1);
+
+			END;
+
+            SET @horaTurno = DATEADD(MINUTE, @duracion, @horaTurno);
+        END;
+
+        SET @fechaActual = DATEADD(DAY, 1, @fechaActual);
+    END;
+END
