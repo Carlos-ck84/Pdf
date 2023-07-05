@@ -1,0 +1,10 @@
+clase abstracta vs interfaz
+
+Se puede declarar metodos pero no implementar (I)
+No se puede hacer herencia multiple (C)
+Se puede implementar constructor (C)
+Puede tener miembros estaticoas (C)
+Todos los accesos tienen q ser publicos (I)
+Todos las declaraciones se tienen q implementar (I)
+Puede definir variables y miembros protected
+Se puede tener miembros abstractos y no abstractos (C)
